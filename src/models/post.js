@@ -77,7 +77,7 @@ const Post = {
                 include:{
                     tags:true
                 }
-            }); // Asenkron işlem olduğu için await ekledik
+            });
         } catch (error) {
             console.error(error);
             throw new Error('Gönderiler alınırken bir hata oluştu.');
@@ -87,9 +87,6 @@ const Post = {
     create: async (category_id,title,content) => {
         try {
             return await prisma.post.create({
-                where:{
-                    deleted_at:null
-                },
                 data:{
                     category_id,
                     title,
@@ -185,7 +182,5 @@ const Post = {
        
     }
 }
-
-
 
 export default Post;

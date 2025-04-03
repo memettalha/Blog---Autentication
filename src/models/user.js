@@ -1,87 +1,99 @@
+import prisma from '../prisma.js';
+import { SHOW_DELETED } from '../const.js';
 import { PrismaClient } from "@prisma/client";
 import  argon2  from "argon2";
-const prisma = new PrismaClient()
+const prismaClient = new PrismaClient()
 
 const User = {
-    
-   create: async (name,userName, password) => {
-    const hashed_password = await argon2.hash(password)
-    try {
-        // Prisma ile comment ekliyoruz
-        return await prisma.user.create({
-            data:{
-                name,
-                userName,
-                hashed_password,
-                role:'member'
+    getAll: async (query) => {
+        try {
+            const { showDeleted } = query;
+            if (showDeleted === SHOW_DELETED.TRUE) {
+                return await prismaClient.user.findMany();
+            } else if (showDeleted === SHOW_DELETED.ONLY_DELETED) {
+                return await prismaClient.user.findMany({
+                    where: {
+                        deleted_at: {
+                            not: null
+                        }
+                    }
+                });
+            } else {
+                return await prismaClient.user.findMany({
+                    where: {
+                        deleted_at: null
+                    }
+                });
             }
-        });
-    } catch (error) {
-        console.error(error);
-        throw new Error('Comment oluşturulurken bir hata oluştu.');
-    }
-},
+        } catch (error) {
+            console.error(error);
+            throw new Error('Veri alınırken bir hata oluştu.');
+        }
+    },
+    
+    getById: async (id) => {
+        try {
+            return await prismaClient.user.findUnique({
+                where: {
+                    id: Number(id),
+                    deleted_at: null
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            throw new Error('Veri alınırken bir hata oluştu.');
+        }
+    },
+    
+    create: async (user) => {
+        try {
+            return await prismaClient.user.create({
+                data: user
+            });
+        } catch (error) {
+            console.error(error);
+            throw new Error('Kullanıcı oluşturulurken bir hata oluştu.');
+        }
+    },
 
-getAll: async (query_string) => {
-    try {
-       
-        return await prisma.user.findMany(); 
-    } catch (error) {
-        console.error(error);
-        throw new Error('Yorumlar alınırken bir hata oluştu.');
-    }
-},
+    update: async (id, userData) => {
+        try {
+            return await prismaClient.user.update({
+                where: {
+                    id: Number(id)
+                },
+                data: userData
+            });
+        } catch (error) {
+            console.error(error);
+            throw new Error('Kullanıcı güncellenirken bir hata oluştu.');
+        }
+    },
 
-getById: async (id) => {
-   return prisma.user.findUnique({
-    where:{
-        id:Number(id),
-        deleted_at:null
-    }
-   })
-},
-getByUserName: async (userName) => {
-    return prisma.user.findUnique({
-     where:{
-         userName:userName,
-         deleted_at:null
-     }
-    })
- },
+    delete: async (id) => {
+        try {
+            return await prismaClient.user.update({
+                where: {
+                    id: Number(id)
+                },
+                data: {
+                    deleted_at: new Date()
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            throw new Error('Kullanıcı silinirken bir hata oluştu.');
+        }
+    },
 
-update: async (id, name, userName,hashedPassword) => {
-try {
-    return await prisma.user.update({
-        where:{id:Number(id)},
-        data:{
-            name,
-            userName,
-            hashedPassword,
-        }       
-});
-} catch (error) {
-    console.error(error);
-    throw new Error('Kategori güncellenirken bir hata oluştu.');
-}
-},
-//    
-delete: async (id) => {
-try {
-    // Silme yerine `deleted_at` alanını güncelliyoruz
-    return await prisma.user.update({
-       where:{
-            id : Number(id),
-            data:{
-                deleted_at: new Date()
-            } 
-       }
+    getByUserName: async (userName) => {
+        return prismaClient.user.findUnique({
+         where:{
+             userName:userName,
+             deleted_at:null
+         }
+        })
+     },
+};
 
-    });
-} catch (error) {
-    console.error(error);
-    throw new Error('Kategori silinirken bir hata oluştu.');
-}
-}
-}
-
-export default User
+export default User;

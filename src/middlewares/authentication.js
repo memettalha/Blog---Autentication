@@ -1,5 +1,5 @@
-import { verifyAccessToken } from "../utils/jwtUtils"
-import User from "../models/user"
+import { verifyAccessToken } from "../utils/jwtUtils.js"
+import User from "../models/user.js"
 
 export const authentication = async (req,res,next) => {
     const token = req.headers['authorization']?.split(' ')[1]
@@ -11,7 +11,7 @@ export const authentication = async (req,res,next) => {
         if(!decoded){
             return res.status(401).json({message:"Invalid access key"})
         }
-        const user = User.getById(decoded.userId)
+        const user = await User.getById(decoded.userId)
         req.user = user
         next()
     } catch (error) {
