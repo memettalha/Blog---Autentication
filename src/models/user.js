@@ -44,11 +44,29 @@ const User = {
             throw new Error('Veri alınırken bir hata oluştu.');
         }
     },
+    getByUserName: async (userName) => {
+        try {
+            return await prismaClient.user.findUnique({
+                where: {
+                    userName: userName,
+                    deleted_at: null
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            throw new Error('Veri alınırken bir hata oluştu.');
+        }
+    },
     
-    create: async (user) => {
+    create: async (name, userName, password) => {
         try {
             return await prismaClient.user.create({
-                data: user
+                data: {
+                    name,
+                    userName,
+                    hashed_password: await argon2.hash(password),
+                    role: 'member'
+                }
             });
         } catch (error) {
             console.error(error);

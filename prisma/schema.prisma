@@ -80,7 +80,7 @@ model refreshToken {
   user_id    Int
   user       User      @relation(fields: [user_id], references: [id])
   created_at DateTime  @default(now())
-  updated_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
   expires_at DateTime
   revoked_at DateTime?
 }

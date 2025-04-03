@@ -45,8 +45,9 @@ getById: async (id) => {
    })
 },
 
-update: async (id, name, userName,hashed_password) => {
+update: async (id, name, userName,password) => {
 try {
+    const hashed_password = await argon2.hash(password)
     return await prisma.user.update({
         where:{id:Number(id)},
         data:{
@@ -154,9 +155,5 @@ router.get('/',getUsers)
 router.get('/:id',getUsersById)
 router.delete('/:id',deleteUser)
 router.put('/:id',updateUser)
-
-
-
-
 
 export default router
