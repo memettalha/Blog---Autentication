@@ -3,15 +3,17 @@ import prisma from '../prisma.js';
 const Tag = {
 
 
-   create: async (post_id,content,commenter_name) => {
+   create: async (name) => {
         try {
             // Prisma ile comment ekliyoruz
             return await prisma.tag.create({
-                
+                data:{
+                    name: name
+                }
             });
         } catch (error) {
             console.error(error);
-            throw new Error('Comment oluşturulurken bir hata oluştu.');
+            throw new Error('Tag oluşturulurken bir hata oluştu.');
         }
     },
     
@@ -21,41 +23,52 @@ const Tag = {
             return await prisma.tag.findMany(); 
         } catch (error) {
             console.error(error);
-            throw new Error('Yorumlar alınırken bir hata oluştu.');
+            throw new Error('Etiketler alınırken bir hata oluştu.');
         }
     },
     
     getById: async (id) => {
-        return prisma.tag.findUnique({
-            where:{
-                id:Number(id)
-            } })
+       try {
+            return await prisma.tag.findUnique({
+                where:({
+                    id:Number(id)
+                })
+            })
+       } catch (error) {
+            console.error(error);
+            throw new Error('Etiketler güncellenirken bir hata oluştu.');
+       }
     },
    
-update: async (id, post_id, content, commenter_name) => {
+update: async (id, name) => {
     try {
         return await prisma.tag.update({
-            
-            
+            where:({
+                id:Number(id)
+            }),
+            data:{
+                name
+            }
     });
     } catch (error) {
         console.error(error);
-        throw new Error('Kategori güncellenirken bir hata oluştu.');
+        throw new Error('Etiketler güncellenirken bir hata oluştu.');
     }
 },
 //    
 delete: async (id) => {
     try {
         // Silme yerine `deleted_at` alanını güncelliyoruz
-        return await prisma.tag.update({
-           
+        return await prisma.tag.delete({
+           where:{
+            id:Number(id)
+           }
 
         });
     } catch (error) {
         console.error(error);
-        throw new Error('Kategori silinirken bir hata oluştu.');
+        throw new Error('Etiketler silinirken bir hata oluştu.');
     }
 }
 };
-
-export default Tag;
+export default Tag

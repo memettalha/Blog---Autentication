@@ -21,7 +21,7 @@ const Tag = {
     getAll: async (query_string) => {
         try {
            
-            return await prisma.comment.findMany(); 
+            return await prisma.tag.findMany(); 
         } catch (error) {
             console.error(error);
             throw new Error('Etiketler alınırken bir hata oluştu.');
@@ -60,7 +60,7 @@ update: async (id, name) => {
 delete: async (id) => {
     try {
         // Silme yerine `deleted_at` alanını güncelliyoruz
-        return await prisma.comment.delete({
+        return await prisma.tag.delete({
            where:{
             id:Number(id)
            }
@@ -79,9 +79,6 @@ delete: async (id) => {
 
 export  const getTags= async (req, res) => {
     try {
-        if (!category_id || !title || !content) {
-            throw new Error("category_id, title ve content değerleri geçerli olmalıdır");
-        }
         const tags = await Tag.getAll();
         res.json(tags);
     } catch (error) {
